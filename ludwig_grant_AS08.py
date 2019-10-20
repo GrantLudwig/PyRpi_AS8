@@ -32,6 +32,7 @@ deadDucks = (   "/home/ludwigg/Python/PyRpi_AS8/blueDuckDead.png",
 duckIndex = 0
 
 aim = Circle(Point(250, 250), 15)
+innerAim = Circle(Point(250, 250), 5)
 target = Image(Point(0, 0), ducks[duckIndex])
 death = Image(Point(0, 0), deadDucks[duckIndex])
 message = Text(Point(100, 100), "")
@@ -66,7 +67,6 @@ def spawnTarget():
 
 def shoot(channel):
     global target
-    global aim
     global kill
     global score
     aimCenter = aim.getCenter()
@@ -78,6 +78,7 @@ def shoot(channel):
 
 def main():
     global aim
+    global innerAim
     global target
     global kill
     global score
@@ -100,6 +101,9 @@ def main():
     spawnTarget()
     
     aim.draw(win)
+    innerAim.draw(win)
+    
+    dog = Image(Point(250,250), "/home/ludwigg/Python/PyRpi_AS8/dog.png")
     
     end = time.time() + 30
     deathTime = 0
@@ -109,6 +113,7 @@ def main():
         if timeLeft <= 0:
             message.setText("Game Over!")
             scoreText.setText("Final Score: " + str(score))
+            dog.draw(win)
             playing = False
         else:
             message.setText(timeLeft)
@@ -122,10 +127,19 @@ def main():
                 spawnTarget()
                 death.draw(win)
                 deathTime = time.time() + .5
+                
             aim.undraw()
+            innerAim.undraw()
+            
             aim = Circle(Point(getXPosition(), getYPosition()), 15)
-            aim.setFill("Red")
+            innerAim = Circle(Point(getXPosition(), getYPosition()), 5)
+            
+            aim.setOutline("Red")
+            innerAim.setFill("Red")
+            
             aim.draw(win)
+            innerAim.draw(win)
+            
             if (deathTime - time.time()) < 0:
                 try:
                     death.undraw()
