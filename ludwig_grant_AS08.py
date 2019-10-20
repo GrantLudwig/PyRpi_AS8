@@ -17,7 +17,7 @@ import RPi.GPIO as GPIO # Raspberry Pi GPIO library
 
 SCREEN_WIDTH = 500
 SCREEN_HEIGHT = 500
-target = null
+target = Circle(Point(250, 250), 10)
 
 win = GraphWin("Target Practice", SCREEN_WIDTH, SCREEN_HEIGHT, autoflush=False)
 
@@ -30,7 +30,6 @@ def getYPosition():
     return -round(chan2.voltage/3.3 * SCREEN_HEIGHT)
 
 def setupTarget():
-    target = Circle(Point(250, 250), 10)
     target.setFill("Red")
     target.draw(win)
 
@@ -39,6 +38,9 @@ def shoot():
 
 def main():
     win.setBackground("Grey")
+
+    setupTarget()
+
     while(true):
         target.undraw()
         target = Circle(Point(getXPosition(), getYPosition()), 10)
