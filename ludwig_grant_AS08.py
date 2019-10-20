@@ -43,9 +43,9 @@ def main():
     setupTarget()
 
     while(true):
-        target.undraw()
-        target = Circle(Point(getXPosition(), getYPosition()), 10)
-        target.draw()
+        target.p1 = getXPosition()
+        target.p2 = getYPosition()
+        #target.draw()
         update(30)
     
     win.close()
