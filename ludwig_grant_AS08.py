@@ -74,16 +74,18 @@ zeroX = round(chan2.voltage/3.3, 1)
 # print("x: ", (round(chan2.voltage/3.3, 1) - zeroX))
 # print("y: ", (round(chan.voltage/3.3, 1) - zeroY))
 try:
-	main()
+    print("Before Main")
+    main()
+    print("After main")
 
 except KeyboardInterrupt: 
     # This code runs on a Keyboard Interrupt <CNTRL>+C
-	print('\n\n' + 'Program exited on a Keyboard Interrupt' + '\n') 
+    print('\n\n' + 'Program exited on a Keyboard Interrupt' + '\n') 
 
 except: 
     # This code runs on any error
-	print('\n' + 'Errors occurred causing your program to exit' + '\n')
+    print('\n' + 'Errors occurred causing your program to exit' + '\n')
 
 finally: 
     # This code runs on every exit and sets any used GPIO pins to input mode.
-	GPIO.cleanup()
+    GPIO.cleanup()
