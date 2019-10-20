@@ -14,39 +14,69 @@ import board
 import adafruit_mcp3xxx.mcp3008 as MCP
 from adafruit_mcp3xxx.analog_in import AnalogIn
 import RPi.GPIO as GPIO # Raspberry Pi GPIO library
+import random
+import math
+import time
 
 SCREEN_WIDTH = 500
 SCREEN_HEIGHT = 500
-target = Circle(Point(250, 250), 10)
+
+kill = False
+
+aim = Circle(Point(250, 250), 15)
+target = Circle(Point(0, 0), 10)
 
 win = GraphWin("Target Practice", SCREEN_WIDTH, SCREEN_HEIGHT, autoflush=False)
 
 def getXPosition():
     global chan
-    return -round(chan.voltage/3.3 * SCREEN_WIDTH)
+    return round(chan.voltage/3.3 * SCREEN_WIDTH)
 
 def getYPosition():
     global chan2
-    return -round(chan2.voltage/3.3 * SCREEN_HEIGHT)
-
-def setupTarget():
-    target.setFill("Red")
+    return round(chan2.voltage/3.3 * SCREEN_HEIGHT)
+    
+def spawnTarget():
+    global target
+    global kill
+    target.undraw()
+    target = Circle(Point(random.randint(20, SCREEN_WIDTH - 20), random.randint(20, SCREEN_HEIGHT - 20)), 10)
+    target.setFill("Blue")
+    kill = False
     target.draw(win)
 
-def shoot():
-    return
+def shoot(channel):
+    global target
+    global aim
+    global kill
+    aimCenter = aim.getCenter()
+    targetCenter = target.getCenter()
+    
+    if math.sqrt((aimCenter.x - targetCenter.x)**2 + (aimCenter.y - targetCenter.y)**2) <= (25):
+        print("killed")
+        kill = True
 
 def main():
+    global aim
     global target
+    global kill
+    # set coordnate plane for easy translation from the joystick position
+    win.setCoords(SCREEN_WIDTH, 0, 0, SCREEN_HEIGHT)
     win.setBackground("Grey")
-
-    setupTarget()
-
-    while(true):
-        target.p1 = getXPosition()
-        target.p2 = getYPosition()
-        #target.draw()
-        update(30)
+    
+    target.draw(win)
+    spawnTarget()
+    
+    aim.draw(win)
+    
+    while(True):
+        if kill:
+            spawnTarget()
+        aim.undraw()
+        aim = Circle(Point(getXPosition(), getYPosition()), 15)
+        aim.setFill("Red")
+        aim.draw(win)
+        update(60)
     
     win.close()
 
@@ -69,17 +99,13 @@ mcp = MCP.MCP3008(spi, cs)
 # create an analog input channel on pin 0
 chan = AnalogIn(mcp, MCP.P0)
 chan2 = AnalogIn(mcp, MCP.P1)
-zeroY = round(chan.voltage/3.3, 1)
-zeroX = round(chan2.voltage/3.3, 1)
 # print("zeroY: ", zeroY)
 # print("zeroX: ", zeroX)
 
 # print("x: ", (round(chan2.voltage/3.3, 1) - zeroX))
 # print("y: ", (round(chan.voltage/3.3, 1) - zeroY))
 try:
-    print("Before Main")
     main()
-    print("After main")
 
 except KeyboardInterrupt: 
     # This code runs on a Keyboard Interrupt <CNTRL>+C
