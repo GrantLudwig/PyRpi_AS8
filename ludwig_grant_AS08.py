@@ -70,6 +70,7 @@ def main():
     global target
     global kill
     global score
+    
     # set coordnate plane for easy translation from the joystick position
     # xll, yll, xur, yur
     win.setCoords(SCREEN_WIDTH, 0, 0, SCREEN_HEIGHT)
@@ -130,11 +131,7 @@ mcp = MCP.MCP3008(spi, cs)
 # create an analog input channel on pin 0
 chan = AnalogIn(mcp, MCP.P0)
 chan2 = AnalogIn(mcp, MCP.P1)
-# print("zeroY: ", zeroY)
-# print("zeroX: ", zeroX)
 
-# print("x: ", (round(chan2.voltage/3.3, 1) - zeroX))
-# print("y: ", (round(chan.voltage/3.3, 1) - zeroY))
 try:
     main()
 
