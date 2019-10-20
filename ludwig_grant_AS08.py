@@ -37,6 +37,7 @@ def shoot():
     return
 
 def main():
+    global target
     win.setBackground("Grey")
 
     setupTarget()
