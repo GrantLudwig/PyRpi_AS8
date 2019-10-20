@@ -25,6 +25,9 @@ kill = False
 
 aim = Circle(Point(250, 250), 15)
 target = Circle(Point(0, 0), 10)
+message = Text(Point(100, 100), "")
+scoreText = Text(Point(100, 50), "")
+score = 0
 
 win = GraphWin("Target Practice", SCREEN_WIDTH, SCREEN_HEIGHT, autoflush=False)
 
@@ -54,36 +57,58 @@ def shoot(channel):
     global target
     global aim
     global kill
+    global score
     aimCenter = aim.getCenter()
     targetCenter = target.getCenter()
     
     if math.sqrt((aimCenter.x - targetCenter.x)**2 + (aimCenter.y - targetCenter.y)**2) <= (25):
-        print("killed")
         kill = True
+        score += 1
 
 def main():
     global aim
     global target
     global kill
+    global score
     # set coordnate plane for easy translation from the joystick position
     # xll, yll, xur, yur
     win.setCoords(SCREEN_WIDTH, 0, 0, SCREEN_HEIGHT)
     win.setBackground("Grey")
+    
+    message.setTextColor("white")
+    message.setSize(20)
+    message.draw(win)
+    
+    scoreText.setTextColor("white")
+    scoreText.setSize(20)
+    scoreText.draw(win)
     
     target.draw(win)
     spawnTarget()
     
     aim.draw(win)
     
-    while(True):
-        if kill:
-            spawnTarget()
-        aim.undraw()
-        aim = Circle(Point(getXPosition(), getYPosition()), 15)
-        aim.setFill("Red")
-        aim.draw(win)
+    end = time.time() + 30
+    playing = True
+    while(playing):
+        timeLeft = round(end - time.time(), 2)
+        if timeLeft <= 0:
+            message.setText("Game Over!")
+            scoreText.setText("Final Score: " + str(score))
+            playing = False
+        else:
+            message.setText(timeLeft)
+            scoreText.setText("Score: " + str(score))
+            if kill:
+                spawnTarget()
+            aim.undraw()
+            aim = Circle(Point(getXPosition(), getYPosition()), 15)
+            aim.setFill("Red")
+            aim.draw(win)
+            
         update(60)
     
+    time.sleep(5)
     win.close()
 
 # Setup GPIO
