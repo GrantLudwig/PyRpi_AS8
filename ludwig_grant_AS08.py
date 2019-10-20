@@ -39,8 +39,13 @@ def getYPosition():
 def spawnTarget():
     global target
     global kill
+    found = False
     target.undraw()
-    target = Circle(Point(random.randint(20, SCREEN_WIDTH - 20), random.randint(20, SCREEN_HEIGHT - 20)), 10)
+    while not found:
+        target = Circle(Point(random.randint(20, SCREEN_WIDTH - 20), random.randint(20, SCREEN_HEIGHT - 20)), 10)
+        targetCenter = target.getCenter()
+        if math.sqrt((250 - targetCenter.x)**2 + (250 - targetCenter.y)**2) <= (260):
+            found = True
     target.setFill("Blue")
     kill = False
     target.draw(win)
@@ -61,6 +66,7 @@ def main():
     global target
     global kill
     # set coordnate plane for easy translation from the joystick position
+    # xll, yll, xur, yur
     win.setCoords(SCREEN_WIDTH, 0, 0, SCREEN_HEIGHT)
     win.setBackground("Grey")
     
