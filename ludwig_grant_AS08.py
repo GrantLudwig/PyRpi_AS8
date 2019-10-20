@@ -23,8 +23,17 @@ SCREEN_HEIGHT = 500
 
 kill = False
 
+ducks = (   "/home/ludwigg/Python/PyRpi_AS8/blueDuck.png",
+            "/home/ludwigg/Python/PyRpi_AS8/blackDuck.png",
+            "/home/ludwigg/Python/PyRpi_AS8/redDuck.png")
+deadDucks = (   "/home/ludwigg/Python/PyRpi_AS8/blueDuckDead.png",
+                "/home/ludwigg/Python/PyRpi_AS8/blackDuckDead.png",
+                "/home/ludwigg/Python/PyRpi_AS8/redDuckDead.png")
+duckIndex = 0
+
 aim = Circle(Point(250, 250), 15)
-target = Circle(Point(0, 0), 10)
+target = Image(Point(0, 0), ducks[duckIndex])
+death = Image(Point(0, 0), deadDucks[duckIndex])
 message = Text(Point(100, 100), "")
 scoreText = Text(Point(100, 50), "")
 score = 0
@@ -42,14 +51,16 @@ def getYPosition():
 def spawnTarget():
     global target
     global kill
+    global ducks
+    global duckIndex
     found = False
     target.undraw()
+    duckIndex = random.randint(0,2)
     while not found:
-        target = Circle(Point(random.randint(20, SCREEN_WIDTH - 20), random.randint(20, SCREEN_HEIGHT - 20)), 10)
-        targetCenter = target.getCenter()
+        target = Image(Point(random.randint(20, SCREEN_WIDTH - 20), random.randint(20, SCREEN_HEIGHT - 20)), ducks[duckIndex])
+        targetCenter = target.getAnchor()
         if math.sqrt((250 - targetCenter.x)**2 + (250 - targetCenter.y)**2) <= (260):
             found = True
-    target.setFill("Blue")
     kill = False
     target.draw(win)
 
@@ -59,9 +70,9 @@ def shoot(channel):
     global kill
     global score
     aimCenter = aim.getCenter()
-    targetCenter = target.getCenter()
+    targetCenter = target.getAnchor()
     
-    if math.sqrt((aimCenter.x - targetCenter.x)**2 + (aimCenter.y - targetCenter.y)**2) <= (25):
+    if math.sqrt((aimCenter.x - targetCenter.x)**2 + (aimCenter.y - targetCenter.y)**2) <= (30):
         kill = True
         score += 1
 
@@ -70,6 +81,7 @@ def main():
     global target
     global kill
     global score
+    global death
     
     # set coordnate plane for easy translation from the joystick position
     # xll, yll, xur, yur
@@ -90,6 +102,7 @@ def main():
     aim.draw(win)
     
     end = time.time() + 30
+    deathTime = 0
     playing = True
     while(playing):
         timeLeft = round(end - time.time(), 2)
@@ -101,11 +114,23 @@ def main():
             message.setText(timeLeft)
             scoreText.setText("Score: " + str(score))
             if kill:
+                try:
+                    death.undraw()
+                except:
+                    return
+                death = Image(target.getAnchor(), deadDucks[duckIndex])
                 spawnTarget()
+                death.draw(win)
+                deathTime = time.time() + .5
             aim.undraw()
             aim = Circle(Point(getXPosition(), getYPosition()), 15)
             aim.setFill("Red")
             aim.draw(win)
+            if (deathTime - time.time()) < 0:
+                try:
+                    death.undraw()
+                except:
+                    return
             
         update(60)
     
