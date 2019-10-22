@@ -122,7 +122,7 @@ def main():
                 try:
                     death.undraw()
                 except:
-                    return
+                    print()
                 death = Image(target.getAnchor(), deadDucks[duckIndex])
                 spawnTarget()
                 death.draw(win)
@@ -144,7 +144,7 @@ def main():
                 try:
                     death.undraw()
                 except:
-                    return
+                    print()
             
         update(60)
     
